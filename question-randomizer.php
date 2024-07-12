@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: Question Randomizer
-Description: A plugin to display random questions using a shortcode.
+Description: A plugin to display random questions using a shortcode and integrate with Gravity Forms for capturing answers.
 Version: 1.0
-Author: Your Name
+Author: Hobo Programming
 */
 
 // Register custom post type
@@ -48,6 +48,9 @@ function qr_display_random_question($atts) {
         $content = get_the_content();
         wp_reset_postdata();
 
+        // Store the question in a transient to retrieve it later
+        set_transient('qr_current_question', $question, 60*60); // 1 hour expiration
+
         // Embed Gravity Form with dynamic form ID
         $form_id = intval($atts['form_id']);
         $gravity_form = gravity_form($form_id, false, false, false, '', true, 1, false);
@@ -60,11 +63,15 @@ function qr_display_random_question($atts) {
 add_shortcode('random_question', 'qr_display_random_question');
 
 // Populate hidden field with selected question
-add_filter('gform_field_value_question', 'qr_populate_question_field');
-function qr_populate_question_field($value) {
-    global $post;
-    if (is_a($post, 'WP_Post') && $post->post_type == 'questions') {
-        return get_the_title($post->ID);
+add_filter('gform_pre_render', 'qr_populate_question_field');
+add_filter('gform_pre_submission_filter', 'qr_populate_question_field');
+
+function qr_populate_question_field($form) {
+    foreach ($form['fields'] as &$field) {
+        if ($field->type == 'hidden' && $field->label == 'Question') {
+            $field->defaultValue = get_transient('qr_current_question');
+            delete_transient('qr_current_question'); // Remove the transient after retrieving the value
+        }
     }
-    return $value;
+    return $form;
 }
