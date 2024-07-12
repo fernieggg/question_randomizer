@@ -6,19 +6,10 @@ Version: 1.0
 Author: Hobo Programming
 */
 
-// Register custom post type
-function qr_register_custom_post_type() {
-    register_post_type('questions', [
-        'labels' => [
-            'name' => 'Questions',
-            'singular_name' => 'Question'
-        ],
-        'public' => true,
-        'has_archive' => true,
-        'supports' => ['title', 'editor'],
-    ]);
-}
-add_action('init', 'qr_register_custom_post_type');
+// Include necessary files
+include_once plugin_dir_path(__FILE__) . 'includes/custom-post-type.php';
+include_once plugin_dir_path(__FILE__) . 'includes/shortcode.php';
+include_once plugin_dir_path(__FILE__) . 'includes/settings-page.php';
 
 // Check for Gravity Forms dependency
 function qr_check_for_gravity_forms() {
@@ -30,43 +21,3 @@ function qr_check_for_gravity_forms() {
     }
 }
 add_action('admin_init', 'qr_check_for_gravity_forms');
-
-// Shortcode to display random question with dynamic Gravity Form ID
-function qr_display_random_question($atts) {
-    $atts = shortcode_atts(['form_id' => 1], $atts, 'random_question');
-    $query_args = [
-        'post_type' => 'questions',
-        'posts_per_page' => 1,
-        'orderby' => 'rand'
-    ];
-
-    $query = new WP_Query($query_args);
-
-    if ($query->have_posts()) {
-        $query->the_post();
-        $question = get_the_title();
-        wp_reset_postdata();
-
-        // Store the question in a transient to retrieve it later
-        set_transient('qr_current_question', $question, 60*60); // 1 hour expiration
-
-        // Embed Gravity Form with dynamic form ID
-        $form_id = intval($atts['form_id']);
-        $gravity_form = gravity_form($form_id, false, false, false, '', true, 1, false);
-
-        return '<div class="qr-question">' . esc_html($question) . '</div><div class="qr-form">' . $gravity_form . '</div>';
-    } else {
-        return '<p>No questions found.</p>';
-    }
-}
-add_shortcode('random_question', 'qr_display_random_question');
-
-// Populate hidden field with selected question
-add_filter('gform_field_value_question', 'qr_populate_question_field');
-function qr_populate_question_field($value) {
-    $question = get_transient('qr_current_question');
-    if ($question) {
-        return $question;
-    }
-    return $value;
-}
