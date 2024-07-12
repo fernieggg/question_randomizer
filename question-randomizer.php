@@ -21,3 +21,4 @@ function qr_check_for_gravity_forms() {
     }
 }
 add_action('admin_init', 'qr_check_for_gravity_forms');
+?>
