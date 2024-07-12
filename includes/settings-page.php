@@ -39,6 +39,11 @@ function qr_handle_create_form() {
             // Define the form
             $form = array(
                 'title' => 'Question Form',
+                'labelPlacement' => 'top_label', // Added default value
+                'button' => array( // Added default button
+                    'type' => 'text',
+                    'text' => 'Submit'
+                ),
                 'fields' => array(
                     array(
                         'type' => 'hidden',
