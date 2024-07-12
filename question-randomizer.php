@@ -48,20 +48,13 @@ function qr_display_random_question($atts) {
         $content = get_the_content();
         wp_reset_postdata();
 
-        // Output the question and form with JavaScript to set the hidden field
+        // Embed Gravity Form with dynamic form ID
         $form_id = intval($atts['form_id']);
-        $output = '<div class="qr-question">' . esc_html($question) . '</div>';
-        $output .= '<div class="qr-form">' . gravity_form($form_id, false, false, false, '', true, 1, false) . '</div>';
-        $output .= "<script type='text/javascript'>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            var questionField = document.querySelector('input[name=\"input_question\"]');
-                            if (questionField) {
-                                questionField.value = '" . esc_js($question) . "';
-                            }
-                        });
-                    </script>";
+        $gravity_form = gravity_form($form_id, false, false, false, '', true, 1, false, true, [
+            'question' => $question
+        ]);
 
-        return $output;
+        return '<div class="qr-question">' . esc_html($question) . '</div><div class="qr-form">' . $gravity_form . '</div>';
     } else {
         return '<p>No questions found.</p>';
     }
@@ -71,5 +64,5 @@ add_shortcode('random_question', 'qr_display_random_question');
 // Populate hidden field with selected question
 add_filter('gform_field_value_question', 'qr_populate_question_field');
 function qr_populate_question_field($value) {
-    return isset($_POST['input_question']) ? sanitize_text_field($_POST['input_question']) : $value;
+    return isset($_GET['question']) ? sanitize_text_field($_GET['question']) : $value;
 }
