@@ -33,6 +33,7 @@ Question Randomizer is a plugin that allows you to display random questions on y
      - Field Type: Hidden
      - Field Visibility: Hidden
      - Advanced Tab > Default Value: Leave this empty. It will be dynamically populated by the plugin.
+     - Field Name: input_question (Set the "Admin Field Label" to "input_question")
 
    - **Paragraph Text Field** (or any field suitable for user responses):
      - Field Label: Answer
