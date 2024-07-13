@@ -52,6 +52,8 @@ To display a random question and embed the Gravity Form, use the following short
 
 ## Changelog
 ```
+2.0
+* Stable Release - Includes Gravity Forms, Formidable, and Contact Form 7.
 1.0
 * Initial release.
 ```

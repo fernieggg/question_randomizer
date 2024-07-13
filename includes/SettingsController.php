@@ -46,6 +46,10 @@ class QR_SettingsController {
                                 <label>
                                     <input type="radio" name="qr_form_builder" value="formidable_forms" <?php checked($form_builder, 'formidable_forms'); ?>>
                                     Formidable Forms
+                                </label><br>
+                                <label>
+                                    <input type="radio" name="qr_form_builder" value="cf7" <?php checked($form_builder, 'cf7'); ?>>
+                                    Contact Form 7
                                 </label>
                             </fieldset>
                         </td>
@@ -72,6 +76,8 @@ class QR_SettingsController {
                     <input type="submit" name="qr_create_gravity_form" class="button button-primary" value="Create Gravity Form">
                 <?php elseif ($form_builder === 'formidable_forms'): ?>
                     <input type="submit" name="qr_create_formidable_form" class="button button-primary" value="Create Formidable Form">
+                <?php elseif ($form_builder === 'cf7'): ?>
+                    <input type="submit" name="qr_create_cf7_form" class="button button-primary" value="Create Contact Form 7">
                 <?php endif; ?>
             </form>
             <hr>
@@ -86,9 +92,13 @@ class QR_SettingsController {
 
     public function save_settings() {
         if (isset($_POST['qr_save_settings']) && check_admin_referer('qr_save_settings', 'qr_save_settings_nonce')) {
+            $previous_form_builder = get_option('qr_form_builder', '');
+
             if (isset($_POST['qr_form_builder'])) {
                 update_option('qr_form_builder', sanitize_text_field($_POST['qr_form_builder']));
+                $this->toggle_plugins($_POST['qr_form_builder'], $previous_form_builder);
             }
+
             $debug_mode = isset($_POST['qr_debug_mode']) ? true : false;
             update_option('qr_debug_mode', $debug_mode);
 
@@ -106,8 +116,61 @@ class QR_SettingsController {
             qr_handle_create_formidable_form();
         }
 
+        if (isset($_POST['qr_create_cf7_form']) && check_admin_referer('qr_create_forms', 'qr_create_forms_nonce')) {
+            qr_handle_create_cf7_form();
+        }
+
         if (isset($_POST['qr_prepopulate_questions']) && check_admin_referer('qr_prepopulate_questions', 'qr_prepopulate_questions_nonce')) {
             qr_handle_prepopulate_questions();
+        }
+    }
+
+    private function toggle_plugins($new_form_builder, $previous_form_builder) {
+        if ($new_form_builder === 'gravity_forms' && $previous_form_builder !== 'gravity_forms') {
+            // Deactivate Formidable Forms and CF7 + Flamingo
+            if (is_plugin_active('formidable/formidable.php')) {
+                deactivate_plugins('formidable/formidable.php');
+            }
+            if (is_plugin_active('contact-form-7/wp-contact-form-7.php')) {
+                deactivate_plugins('contact-form-7/wp-contact-form-7.php');
+            }
+            if (is_plugin_active('flamingo/flamingo.php')) {
+                deactivate_plugins('flamingo/flamingo.php');
+            }
+            // Activate Gravity Forms
+            if (!is_plugin_active('gravityforms/gravityforms.php')) {
+                activate_plugin('gravityforms/gravityforms.php');
+            }
+        } elseif ($new_form_builder === 'formidable_forms' && $previous_form_builder !== 'formidable_forms') {
+            // Deactivate Gravity Forms and CF7 + Flamingo
+            if (is_plugin_active('gravityforms/gravityforms.php')) {
+                deactivate_plugins('gravityforms/gravityforms.php');
+            }
+            if (is_plugin_active('contact-form-7/wp-contact-form-7.php')) {
+                deactivate_plugins('contact-form-7/wp-contact-form-7.php');
+            }
+            if (is_plugin_active('flamingo/flamingo.php')) {
+                deactivate_plugins('flamingo/flamingo.php');
+            }
+            // Activate Formidable Forms
+            if (!is_plugin_active('formidable/formidable.php')) {
+                activate_plugin('formidable/formidable.php');
+            }
+        } elseif ($new_form_builder === 'cf7' && $previous_form_builder !== 'cf7') {
+            // Deactivate Gravity Forms and Formidable Forms
+            if (is_plugin_active('gravityforms/gravityforms.php')) {
+                deactivate_plugins('gravityforms/gravityforms.php');
+            }
+            if (is_plugin_active('formidable/formidable.php')) {
+                deactivate_plugins('formidable/formidable.php');
+            }
+            // Activate Contact Form 7 and Flamingo
+            if (!is_plugin_active('contact-form-7/wp-contact-form-7.php')) {
+                activate_plugin('contact-form-7/wp-contact-form-7.php');
+            }
+            if (!is_plugin_active('flamingo/flamingo.php')) {
+                activate_plugin('flamingo/flamingo.php');
+            }
         }
     }
 }

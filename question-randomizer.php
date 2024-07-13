@@ -1,12 +1,14 @@
 <?php
 /*
 Plugin Name: Question Randomizer
-Description: Display random questions using Gravity Forms or Formidable Forms.
-Version: 1.0
+Description: Display random questions using Gravity Forms, Formidable Forms, or Contact Form 7 for capturing answers.
+Version: 2.0
 Author: Hobo Programming
 */
 
 // Include necessary files
+require_once(plugin_dir_path(__FILE__) . 'includes/tgmpa/class-tgm-plugin-activation.php');
+require_once(plugin_dir_path(__FILE__) . 'includes/tgmpa-config.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/SettingsController.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/update-config.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/admin-notices.php');
@@ -14,6 +16,7 @@ require_once(plugin_dir_path(__FILE__) . 'includes/shortcode.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/prepopulate-questions.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/create-gravity-form.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/create-formidable-form.php');
+require_once(plugin_dir_path(__FILE__) . 'includes/create-cf7-form.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/custom-post-type.php');
 
 // Plugin activation hook
@@ -42,22 +45,13 @@ function qr_is_formidable_forms_active() {
     return class_exists('FrmForm');
 }
 
-// Unregister default custom post type menu
-add_action('admin_menu', 'qr_remove_default_cpt_menu', 999);
-function qr_remove_default_cpt_menu() {
-    remove_menu_page('edit.php?post_type=questions');
+// Check if Contact Form 7 is active
+function qr_is_cf7_active() {
+    return class_exists('WPCF7_ContactForm');
 }
 
-// Highlight the custom menu when on the Questions page
-add_filter('parent_file', 'qr_custom_menu_highlight');
-function qr_custom_menu_highlight($parent_file) {
-    global $submenu_file, $current_screen;
-
-    if ($current_screen->post_type == 'questions') {
-        $submenu_file = 'edit.php?post_type=questions';
-        $parent_file = 'qr-settings-main';
-    }
-
-    return $parent_file;
+// Check if Flamingo is active
+function qr_is_flamingo_active() {
+    return class_exists('Flamingo_Inbound');
 }
 ?>
