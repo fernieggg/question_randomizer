@@ -7,8 +7,7 @@ Author: Hobo Programming
 */
 
 // Include necessary files
-require_once(plugin_dir_path(__FILE__) . 'includes/settings-page.php');
-require_once(plugin_dir_path(__FILE__) . 'includes/save-settings.php');
+require_once(plugin_dir_path(__FILE__) . 'includes/SettingsController.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/update-config.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/admin-notices.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/shortcode.php');
@@ -41,5 +40,24 @@ function qr_is_gravity_forms_active() {
 // Check if Formidable Forms is active
 function qr_is_formidable_forms_active() {
     return class_exists('FrmForm');
+}
+
+// Unregister default custom post type menu
+add_action('admin_menu', 'qr_remove_default_cpt_menu', 999);
+function qr_remove_default_cpt_menu() {
+    remove_menu_page('edit.php?post_type=questions');
+}
+
+// Highlight the custom menu when on the Questions page
+add_filter('parent_file', 'qr_custom_menu_highlight');
+function qr_custom_menu_highlight($parent_file) {
+    global $submenu_file, $current_screen;
+
+    if ($current_screen->post_type == 'questions') {
+        $submenu_file = 'edit.php?post_type=questions';
+        $parent_file = 'qr-settings-main';
+    }
+
+    return $parent_file;
 }
 ?>

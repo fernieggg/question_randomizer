@@ -47,3 +47,9 @@ To display a random question and embed the Gravity Form, use the following short
 
 ```plaintext
 [random_question form_id=your_gravity_form_id]
+
+== Changelog ==
+
+= 1.0 =
+
+Initial Stable release.
