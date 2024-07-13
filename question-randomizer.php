@@ -2,7 +2,7 @@
 /*
 Plugin Name: Question Randomizer
 Description: Display random questions using Gravity Forms, Formidable Forms, or Contact Form 7 for capturing answers.
-Version: 2.0
+Version: 1.0
 Author: Hobo Programming
 */
 
@@ -10,7 +10,7 @@ Author: Hobo Programming
 require_once(plugin_dir_path(__FILE__) . 'includes/tgmpa/class-tgm-plugin-activation.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/tgmpa-config.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/SettingsController.php');
-require_once(plugin_dir_path(__FILE__) . 'includes/update-config.php');
+require_once(plugin_dir_path(__FILE__) . 'includes/utility-functions.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/admin-notices.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/shortcode.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/prepopulate-questions.php');
@@ -18,6 +18,13 @@ require_once(plugin_dir_path(__FILE__) . 'includes/create-gravity-form.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/create-formidable-form.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/create-cf7-form.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/custom-post-type.php');
+
+// Enqueue Tailwind CSS and Alpine.js
+function qr_enqueue_assets() {
+    wp_enqueue_style('tailwindcss', 'https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css');
+    wp_enqueue_script('alpinejs', 'https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.4.2/cdn.min.js', [], null, true);
+}
+add_action('admin_enqueue_scripts', 'qr_enqueue_assets');
 
 // Plugin activation hook
 register_activation_hook(__FILE__, 'qr_activate_plugin');
