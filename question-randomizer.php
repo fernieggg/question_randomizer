@@ -2,7 +2,7 @@
 /*
 Plugin Name: Question Randomizer
 Description: Display random questions using Gravity Forms, Formidable Forms, or Contact Form 7 for capturing answers.
-Version: 1.0
+Version: 1.3
 Author: Hobo Programming
 */
 
@@ -18,6 +18,7 @@ require_once(plugin_dir_path(__FILE__) . 'includes/create-gravity-form.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/create-formidable-form.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/create-cf7-form.php');
 require_once(plugin_dir_path(__FILE__) . 'includes/custom-post-type.php');
+require_once(plugin_dir_path(__FILE__) . 'includes/ajax.php'); // Include the AJAX functionality
 
 // Enqueue Tailwind CSS and Alpine.js
 function qr_enqueue_assets() {
@@ -25,6 +26,13 @@ function qr_enqueue_assets() {
     wp_enqueue_script('alpinejs', 'https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.4.2/cdn.min.js', [], null, true);
 }
 add_action('admin_enqueue_scripts', 'qr_enqueue_assets');
+
+// Enqueue debug-toggle.js script and localize nonce
+function qr_enqueue_debug_toggle_script() {
+    wp_enqueue_script('qr_debug_toggle', plugin_dir_url(__FILE__) . 'assets/debug-toggle.js', [], null, true);
+    wp_localize_script('qr_debug_toggle', 'qr_toggle_debug_mode', ['nonce' => wp_create_nonce('qr_toggle_debug_mode')]);
+}
+add_action('admin_enqueue_scripts', 'qr_enqueue_debug_toggle_script');
 
 // Plugin activation hook
 register_activation_hook(__FILE__, 'qr_activate_plugin');

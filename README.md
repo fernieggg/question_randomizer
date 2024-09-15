@@ -4,7 +4,7 @@
 **Tags**: questions, randomizer, gravity forms, shortcode  
 **Requires at least**: 5.0  
 **Tested up to**: 5.8  
-**Stable tag**: 1.0  
+**Stable tag**: 1.3  
 **Requires PHP**: 7.0  
 **License**: GPLv2 or later  
 **License URI**: [GPLv2 or later](http://www.gnu.org/licenses/gpl-2.0.html)
@@ -52,7 +52,9 @@ To display a random question and embed the Gravity Form, use the following short
 
 ## Changelog
 ```
-2.0
+1.3
+* Stable Release - Finalized Plugin for Beta.
+1.1
 * Stable Release - Includes Gravity Forms, Formidable, and Contact Form 7.
 1.0
 * Initial release.

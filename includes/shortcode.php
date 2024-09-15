@@ -29,6 +29,13 @@ function qr_display_random_question($atts) {
 
         // Store the question in a transient to retrieve it later
         set_transient('qr_current_question', $question, 60 * 60); // 1 hour expiration
+        
+        // Check if debugging is enabled
+if (defined('WP_DEBUG') && WP_DEBUG) {
+    // Output a JavaScript console message to indicate the transient was set
+    echo "<script>console.log('Transient qr_current_question set with value: " . esc_js($question) . "');</script>";
+}
+
 
         // Embed the appropriate form
         $form_id = intval($atts['form_id']);
@@ -60,18 +67,26 @@ function qr_populate_question_field($value) {
     return $value;
 }
 
-// Populate hidden field with selected question (for Formidable Forms)
+
 add_filter('frm_get_default_value', 'qr_populate_formidable_field', 10, 2);
+
 function qr_populate_formidable_field($new_value, $field) {
-    if ($field->field_key === 'field_question') {
-        $question = get_transient('qr_current_question');
+    // Log whenever the function is called
+    error_log("frm_get_default_value called for field: " . $field->field_key);
+    // Check if the field key is 'field_question'
+    if ($field->field_key === 'question') { // Use the field key to identify the correct field
+        $question = get_transient('qr_current_question'); // Retrieve the question stored in the transient
         error_log("Retrieved question from transient: " . $question); // Debugging
         if ($question) {
-            return $question;
+            return $question; // Return the question to populate the field
         }
     }
-    return $new_value;
+
+    return $new_value; // Return the original value if the field key does not match
 }
+
+
+
 
 // Populate hidden field with selected question (for CF7)
 add_filter('wpcf7_form_tag', 'qr_populate_cf7_hidden_field', 10, 2);
